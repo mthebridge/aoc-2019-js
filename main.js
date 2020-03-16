@@ -1,34 +1,48 @@
+const TESTING = false;
+
 function read_text_input(file, callback) {
     var xhttp = new XMLHttpRequest()
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
+    xhttp.onreadystatechange = () => {
+        if (xhttp.readyState == 4 && xhttp.status < 400) {
             console.debug("Read text input OK");
-            callback(this.responseText)
+            callback(xhttp.responseText)
         }
 
     }
-    xhttp.overrideMimeType("text/plain");
+    // xhttp.overrideMimeType("text/plain");
     xhttp.open("GET", file, true);
     xhttp.send()
 
 }
 
 function day1() {
-    read_text_input("./day1.txt", function (input) {
-        console.debug("Response ready")
-        var masses = input.split("\n");
-        console.debug(masses.length + " days of input");
+    function calc_fuel(mass, recurse) {
+        let m = parseInt(mass);
+        // console.debug("Mass " + m)
+        let thisFuel = Math.max(Math.floor(m / 3) - 2, 0);
+        var moduleFuel = thisFuel;
+        if (recurse && thisFuel > 0) {
+            moduleFuel += calc_fuel(moduleFuel, true)
+        }
+        return moduleFuel;
+    };
+
+    function calc_fuel_totals(masses, recurse) {
         var fuel = 0;
         masses.forEach(m => {
-            var mass = parseInt(m);
-            console.debug("Next mass = " + mass);
-            let this_fuel = Math.floor(m / 3) - 2;
-            console.debug("This fuel:" + this_fuel);
-            console.debug("Fuel so far: " + fuel)
-            fuel = fuel + this_fuel;
+            // console.debug("Next mass = " + m);
+            fuel += calc_fuel(m, recurse);
         });
-        document.getElementById("day1").innerHTML = "Day 1 Part 1: Total fuel is <b>" + fuel + "</b>";
-    //   var day2_pt2 = "<unknown>";
+        return fuel
+    };
+
+    read_text_input("./day1.txt", function (input) {
+        var masses = input.split("\n");
+        console.debug(masses.length + " days of input");
+        let fuel = calc_fuel_totals(masses, false);
+        let fixed_fuel = calc_fuel_totals(masses, true);
+        document.getElementById("day1").innerHTML = "Day 1 Part 1: Total fuel is <b>" + fuel + "</b>.  Adjusted for Part2: <b>" + fixed_fuel + "</b>";
+        //   var day2_pt2 = "<unknown>";
     })
 }
 
@@ -56,3 +70,7 @@ function run_puzzles() {
 
 initialize()
 run_puzzles()
+
+if (TESTING) {
+    run_tests()
+}
