@@ -7,12 +7,9 @@ function read_text_input(file, callback) {
             console.debug("Read text input OK");
             callback(xhttp.responseText)
         }
-
     }
-    // xhttp.overrideMimeType("text/plain");
     xhttp.open("GET", file, true);
     xhttp.send()
-
 }
 
 function day1() {
@@ -41,13 +38,11 @@ function day1() {
         console.debug(masses.length + " days of input");
         let fuel = calc_fuel_totals(masses, false);
         let fixed_fuel = calc_fuel_totals(masses, true);
-        document.getElementById("day1").innerHTML = "Day 1 Part 1: Total fuel is <b>" + fuel + "</b>.  Adjusted for Part2: <b>" + fixed_fuel + "</b>";
-        //   var day2_pt2 = "<unknown>";
+        document.getElementById("day1").innerHTML = "Day 1: Total fuel is <b>" + fuel + "</b>.  Adjusted for Part 2: <b>" + fixed_fuel + "</b>";
     })
 }
 
 function initialize(days = 25) {
-
     var results = document.createElement("div");
     for (let i = 1; i <= days; i++) {
         let dayname = "day" + i;
@@ -72,5 +67,6 @@ initialize()
 run_puzzles()
 
 if (TESTING) {
+    // Might need this later...
     run_tests()
 }
