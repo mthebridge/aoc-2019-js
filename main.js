@@ -2,7 +2,8 @@ function read_text_input(file, callback) {
     var xhttp = new XMLHttpRequest()
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            callback(this.response_text)
+            console.debug("Read text input OK");
+            callback(this.responseText)
         }
 
     }
@@ -13,18 +14,22 @@ function read_text_input(file, callback) {
 }
 
 function day1() {
-    var pt1 = read_text_input("./day1.txt", function (input) {
+    read_text_input("./day1.txt", function (input) {
+        console.debug("Response ready")
         var masses = input.split("\n");
+        console.debug(masses.length + " days of input");
         var fuel = 0;
         masses.forEach(m => {
             var mass = parseInt(m);
-            //   console.debug("Next mass = " + mass);
-            fuel = fuel + Math.floor(m / 3) - 2;
+            console.debug("Next mass = " + mass);
+            let this_fuel = Math.floor(m / 3) - 2;
+            console.debug("This fuel:" + this_fuel);
+            console.debug("Fuel so far: " + fuel)
+            fuel = fuel + this_fuel;
         });
-        document.getElementById("day1").innerHTML = "Day 1 Part 1 = " + pt1;
+        document.getElementById("day1").innerHTML = "Day 1 Part 1: Total fuel is <b>" + fuel + "</b>";
     //   var day2_pt2 = "<unknown>";
-    });
-
+    })
 }
 
 function initialize(days = 25) {

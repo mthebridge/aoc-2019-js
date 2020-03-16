@@ -1,9 +1,9 @@
 body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-  background-color: green;
+  background-color: lightgreen;
   color: red;
 }
 
-.day {
+h1 {
     text-align: center;
 }
