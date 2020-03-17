@@ -7,3 +7,8 @@ body {
 h1 {
     text-align: center;
 }
+
+table.results {
+  table-layout: fixed;
+  text-align: left;
+}
