@@ -58,16 +58,33 @@ async function parseWirePath(input) {
     return path;
 }
 
-async function findClosestCrossingPoint(wire1, wire2) {
+async function getPaths(wire1, wire2) {
     let path1Promise = parseWirePath(wire1);
     let path2Promise = parseWirePath(wire2);
-    let paths = await Promise.all([path1Promise, path2Promise]);
-    console.log("Paths returned", paths[0], paths[1])
+    return Promise.all([path1Promise, path2Promise]);
+}
+
+async function findClosestCrossingPoint(wire1, wire2) {
+    let paths = await getPaths(wire1, wire2);
     // Now find the intersections.
-    // The naive double-loop is too slow??
     let crossings = paths[0].filter(p1 => paths[1].some(p2 => p1.isEqual(p2)));
-    console.debug(`There are ${crossings.length} crossing points`, crossings);
     let distances = crossings.map(pt => pt.originDistance()).sort((a, b) => a - b)
+    return distances[0]
+}
+
+async function findMinimalCrossingSteps(wire1, wire2) {
+    let paths = await getPaths(wire1, wire2);
+    let crossSteps = [];
+    paths[0].forEach((p1, idx) => {
+        let p2idx = paths[1].findIndex(p2 => p1.isEqual(p2))
+        if (p2idx != -1) {
+            // Need to add two as arrays are 0-indexed but we want 1-indexed
+            crossSteps.push(idx + p2idx + 2)
+        }
+    });
+    console.debug("Steps to crossing points", crossSteps);
+
+    let distances = crossSteps.sort((a, b) => a - b)
     return distances[0]
 
 }
@@ -76,9 +93,10 @@ function run_day3() {
     read_text_input("inputs/day3.txt", (input) => {
         // Might as well parse both input
         let wires = input.split("\n");
-        findClosestCrossingPoint(wires[0], wires[1]).then((result) => {
-            document.getElementById("day3").innerHTML = `Position output <b>${result}</b>.`;
-        })
+        Promise.all([findClosestCrossingPoint(wires[0], wires[1]), findMinimalCrossingSteps(wires[0], wires[1])])
+            .then((result) => {
+                document.getElementById("day3").innerHTML = `Taxicab minimal distance <b>${result[0]}</b>. Minmal steps <b>${result[1]}</b>`;
+            })
     })
 }
 
@@ -88,8 +106,12 @@ async function tests_day3() {
     passes += test_assert("Test 1.1", await findClosestCrossingPoint("R8,U5,L5,D3", "U7,R6,D4,L4"), 6);
     passes += test_assert("Test 1.2", await findClosestCrossingPoint("R75,D30,R83,U83,L12,D49,R71,U7,L72", "U62,R66,U55,R34,D71,R55,D58,R83"), 159);
     passes += test_assert("Test 1.3", await findClosestCrossingPoint("R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51",
-      "U98,R91,D20,R16,D67,R40,U7,R15,U6,R7"), 135);
-    document.getElementById("tests3").innerHTML = `${passes}/3 tests passed`;
+        "U98,R91,D20,R16,D67,R40,U7,R15,U6,R7"), 135);
+    passes += test_assert("Test 2.1", await findMinimalCrossingSteps("R8,U5,L5,D3", "U7,R6,D4,L4"), 30);
+    passes += test_assert("Test 2.2", await findMinimalCrossingSteps("R75,D30,R83,U83,L12,D49,R71,U7,L72", "U62,R66,U55,R34,D71,R55,D58,R83"), 610);
+    passes += test_assert("Test 2.3", await findMinimalCrossingSteps("R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51",
+        "U98,R91,D20,R16,D67,R40,U7,R15,U6,R7"), 410);
+    document.getElementById("tests3").innerHTML = `${passes}/6 tests passed`;
 }
 
 
