@@ -1,10 +1,11 @@
 
 /// Initialiation
 const NUM_DAYS = 25;
-const AVAILABLE_DAYS = 2;
+const AVAILABLE_DAYS = 3;
 
-import { run_day1, tests_day1} from './day1.js';
+import { run_day1, tests_day1 } from './day1.js';
 import { run_day2, tests_day2 } from './day2.js';
+import { run_day3, tests_day3 } from './day3.js';
 
 export function setup() {
     console.log("Running setup")
@@ -30,4 +31,6 @@ export function setup() {
     document.getElementById(`button-tests1`).addEventListener("click", tests_day1);
     document.getElementById(`button-day2`).addEventListener("click", run_day2);
     document.getElementById(`button-tests2`).addEventListener("click", tests_day2);
+    document.getElementById(`button-day3`).addEventListener("click", run_day3);
+    document.getElementById(`button-tests3`).addEventListener("click", tests_day3);
 }
