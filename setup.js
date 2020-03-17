@@ -15,8 +15,8 @@ export function setup() {
         results += "<tr>";
         results += `<td>Day ${i}</td>`;
         if (i <= AVAILABLE_DAYS) {
-            results += `<td><button id ="day${i}" type="button">Solve!</button></td>`;
-            results += `<td><button type="button" id ="tests${i}">Unit tests!</button></td>`;
+            results += `<td><div id="day${i}"><button  type="button">Solve!</button></div></td>`;
+            results += `<td><div id="tests${i}"><button type="button">Unit tests!</button></div></td>`;
         } else {
             results += `<td>-</td>`;
             results += `<td>-</td>`;
