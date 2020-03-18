@@ -6,6 +6,7 @@ const AVAILABLE_DAYS = 3;
 import { run_day1, tests_day1 } from './day1.js';
 import { run_day2, tests_day2 } from './day2.js';
 import { run_day3, tests_day3 } from './day3.js';
+// import { run_day4, tests_day4 } from './day4.js';
 
 export function setup() {
     console.log("Running setup")
@@ -27,10 +28,28 @@ export function setup() {
     document.getElementById("results").innerHTML = results
 
     // Now add the event handlers for the buttons.
-    document.getElementById(`button-day1`).addEventListener("click", run_day1);
-    document.getElementById(`button-tests1`).addEventListener("click", tests_day1);
-    document.getElementById(`button-day2`).addEventListener("click", run_day2);
-    document.getElementById(`button-tests2`).addEventListener("click", tests_day2);
-    document.getElementById(`button-day3`).addEventListener("click", run_day3);
-    document.getElementById(`button-tests3`).addEventListener("click", tests_day3);
+    let runFn, testFn;
+    for (let i = 1; i <= AVAILABLE_DAYS; i++) {
+        switch (i) {
+            case 1:
+                runFn = run_day1;
+                testFn = tests_day1;
+                break;
+            case 2:
+                runFn = run_day2;
+                testFn = tests_day2;
+                break;
+            case 3:
+                runFn = run_day3;
+                testFn = tests_day3;
+                break;
+
+            default:
+                break;
+        }
+
+        document.getElementById(`button-day${i}`).addEventListener("click", runFn);
+        document.getElementById(`button-tests${i}`).addEventListener("click", testFn);
+    }
+    console.log("Finished setup")
 }

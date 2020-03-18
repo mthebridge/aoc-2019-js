@@ -1,0 +1,13 @@
+import { read_text_input, test_assert } from "./utils.js";
+
+function run_dayn() {
+    read_text_input("inputs/dayn.txt", (input) => {
+        document.getElementById("dayn").innerHTML = ``;
+    })
+}
+
+function tests_dayn() {
+
+}
+
+export { run_dayn, tests_dayn };
