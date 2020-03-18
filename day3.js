@@ -3,36 +3,38 @@ import { read_text_input, test_assert } from "./utils.js";
 // Convert the path into a set of points that the path covers
 //
 // For speed store the coordinate as a 32-bt number - top 16 bits x,
-// bottom 16 y
+// bottom 16.  So that requires 2^16 as a multiplier.
+
 async function parseWirePath(input) {
     let cursor = {x: 0, y: 0};
     let path = [];
+    let distance = 1;
     input.split(",").forEach(step => {
         let dir = step.slice(0, 1);
         let len = parseInt(step.slice(1));
-        // console.debug("Next direction", dir, len);
+        // console.debug(" paths[0][Next direction", dir, len);
         switch (dir) {
             case "R":
                 for (let i = 1; i <= len; i++) {
-                    path.push(((cursor.x + i) << 16) + cursor.y)
+                    path.push({ value: ((cursor.x + i) << 16) + cursor.y, distance: distance++})
                 }
                 cursor.x += len;
                 break;
             case "L":
                 for (let i = 1; i <= len; i++) {
-                    path.push(((cursor.x - i) << 16) + cursor.y)
+                    path.push({ value: ((cursor.x - i) << 16) + cursor.y, distance: distance++})
                 }
                 cursor.x -= len;
                 break;
             case "U":
                 for (let i = 1; i <= len; i++) {
-                    path.push((cursor.x << 16) + cursor.y + i)
+                    path.push({ value: (cursor.x << 16) + cursor.y + i, distance: distance++})
                 }
                 cursor.y += len;
                 break;
             case "D":
                 for (let i = 1; i <= len; i++) {
-                    path.push((cursor.x << 16) + cursor.y - i)
+                    path.push({ value: (cursor.x << 16) + cursor.y - i, distance: distance++})
                 }
                 cursor.y -= len;
                 break;
@@ -42,38 +44,47 @@ async function parseWirePath(input) {
         }
     });
     console.debug("Paths are:", path);
-    return path;
+    return path.sort((a, b) => a.value - b.value);
 }
 
-async function getPaths(wire1, wire2) {
+async function findCrossings(wire1, wire2) {
     let path1Promise = parseWirePath(wire1);
     let path2Promise = parseWirePath(wire2);
-    return Promise.all([path1Promise, path2Promise]);
+    let paths = await Promise.all([path1Promise, path2Promise]);
+    // Sort the paths and iterate over them.
+    let i = 0, j= 0;
+    let crossings = [];
+    while ((i < paths[0].length) && (j < paths[1].length)) {
+        let valA = paths[0][i].value;
+        let valB = paths[1][j].value;
+        if (valA < valB) {
+            i++;
+        }
+        if (valA > valB) {
+            j++;
+        }
+        if (valA == valB) {
+            //Match!  The "distance" in each path is 1 more than the index
+            crossings.push({ distanceA: paths[0][i].distance, distanceB: paths[1][j].distance, value: valA })
+            i++;
+            j++;
+        }
+    }
+    console.debug("Crossing points are", crossings);
+    return crossings
 }
 
 async function findClosestCrossingPoint(wire1, wire2) {
-    let paths = await getPaths(wire1, wire2);
     // Now find the intersections.
-    let crossings = paths[0].filter(p1 => paths[1].includes(p1));
-    let distances = crossings.map(pt => ((pt >>> 16)) + (pt & 0xffff)).sort((a, b) => a - b)
+    let crossings = await findCrossings(wire1, wire2);
+    let distances = crossings.map(pt => (parseInt(pt.value >>> 16) + parseInt(pt.value & 0xFFFF))).sort((a, b) => a - b)
     return distances[0]
 }
 
 async function findMinimalCrossingSteps(wire1, wire2) {
-    let paths = await getPaths(wire1, wire2);
-    let crossSteps = [];
-    paths[0].forEach((p1, idx) => {
-        let p2idx = paths[1].findIndex(p2 => p1 == p2)
-        if (p2idx != -1) {
-            // Need to add two as arrays are 0-indexed but we want 1-indexed
-            crossSteps.push(idx + p2idx + 2)
-        }
-    });
-    console.debug("Steps to crossing points", crossSteps);
-
-    let distances = crossSteps.sort((a, b) => a - b)
+    let crossings = await findCrossings(wire1, wire2);
+    let distances = crossings.map(pt => pt.distanceA + pt.distanceB).sort((a, b) => a - b)
     return distances[0]
-
 }
 
 function run_day3() {
