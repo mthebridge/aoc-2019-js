@@ -1,5 +1,5 @@
 import { read_text_input, test_assert } from "./utils.js";
-import { run_program } from "./intcode.js";
+import { run_program, test_program } from "./intcode.js";
 
 function run_gravity_assist(program, noun, verb) {
     // Take a copy of the program.
@@ -42,10 +42,6 @@ function run_day2() {
 /// Tests for basic IntCode computer.
 function tests_day2() {
 
-    function test_program(desc, program, expected) {
-        run_program(program);
-        return test_assert(desc, program.join(", "), expected)
-    }
     let passes = 0;
     passes += test_program("Test 1.1",
         [1, 9, 10, 3, 2, 3, 11, 0, 99, 30, 40, 50],

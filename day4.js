@@ -61,7 +61,7 @@ function tests_day4() {
     passes += test_assert("2.4", isPassValid("112222", true), true);
     passes += test_assert("2.5", isPassValid("111111", true), false);
 
-    document.getElementById("tests4").innerHTML = `${passes}/8 tests passed`;
+    document.getElementById("tests4").innerHTML = `${passes}/9 tests passed`;
 }
 
 export { run_day4, tests_day4 };
