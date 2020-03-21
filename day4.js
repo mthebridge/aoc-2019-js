@@ -22,7 +22,7 @@ function isPassValid(pass, noLongPairs) {
                 // Was already a pair - this is the third char.
                 maybe_pair = false
             } else {
-               maybe_pair = true;
+                maybe_pair = true;
             }
         } else {
             // Not in a repetition
@@ -42,7 +42,7 @@ function run_day4() {
     let numValid1 = 0;
     let numValid2 = 0;
 
-    for (let thisPass = MIN_VALUE; thisPass <= MAX_VALUE; thisPass++ ) {
+    for (let thisPass = MIN_VALUE; thisPass <= MAX_VALUE; thisPass++) {
         numValid1 += isPassValid(thisPass.toString(), false);
         numValid2 += isPassValid(thisPass.toString(), true);
     }
@@ -51,9 +51,9 @@ function run_day4() {
 
 function tests_day4() {
     let passes = 0;
-    passes += test_assert("1.1",isPassValid("111111", false), true);
-    passes += test_assert("1.2",isPassValid("223450", false), false);
-    passes += test_assert("1.3",isPassValid("123789", false), false);
+    passes += test_assert("1.1", isPassValid("111111", false), true);
+    passes += test_assert("1.2", isPassValid("223450", false), false);
+    passes += test_assert("1.3", isPassValid("123789", false), false);
     passes += test_assert("1.4", isPassValid("123444", false), true);
     passes += test_assert("2.1", isPassValid("112233", true), true);
     passes += test_assert("2.2", isPassValid("123444", true), false);

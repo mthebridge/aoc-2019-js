@@ -13,10 +13,16 @@ export function run_program(program, inputs) {
         return res;
     }
 
-    function read_operands(program, counterAddress, numOperands) {
+    function read_operands(program, counterAddress, numOperands, modes) {
         let operands = [];
-        for (let i = 0; i <= numOperands; i++) {
-            operands.push(read_position(program, counterAddress + i))
+        for (let i = 0; i < numOperands; i++) {
+            let value = read_position(program, counterAddress + i)
+            if (modes[i] == 1) {
+                operands.push(value)
+            } else {
+                operands.push(read_position(program, value))
+            }
+
         }
 
         return operands;
@@ -27,54 +33,102 @@ export function run_program(program, inputs) {
     let inputIdx = 0;
     while (counter < MAX_COUNTER) {
         let instruction = read_position(program, counter);
+        counter += 1;
         //console.debug("Opcode:", opcode)
         let opcode = instruction % 100;
         let modes = []
+        let operands;
+        let outputAddr;
         let ret = Math.floor(instruction / 100);
         while (ret > 0) {
             modes.push(ret % 10);
             ret = Math.floor(ret / 10)
         }
-        let op1, op2;
 
         switch (opcode) {
             case 1:
-                let addOperands = read_operands(program, counter + 1, 2);
-                console.debug("Addition", addOperands, modes)
-                if (modes[0] == 1) { op1 = addOperands[0]; } else { op1 = read_position(program, addOperands[0]); }
-                if (modes[1] == 1) { op2 = addOperands[1]; } else { op2 = read_position(program, addOperands[1]); }
-                program[addOperands[2]] = op1 + op2;
-                counter += 4;
+                // Addition
+                operands = read_operands(program, counter, 2, modes);
+                counter += 2;
+                // For output, read the value, not what's at the address
+                outputAddr = read_operands(program, counter, 1, [1]);
+                counter += 1;
+                // console.debug("Addition", addOperands, outputAddr, modes)
+                program[outputAddr] = operands[0] + operands[1];
                 break;
             case 2:
-                let multOperands = read_operands(program, counter + 1, 2);
-                console.debug("Multiplication", multOperands, modes)
-                if (modes[0] == 1) { op1 = multOperands[0]; } else { op1 = read_position(program, multOperands[0]); }
-                if (modes[1] == 1) { op2 = multOperands[1]; } else { op2 = read_position(program, multOperands[1]); }
-                program[multOperands[2]] = op1 * op2;
-                counter += 4;
+                // Multiplication
+                operands = read_operands(program, counter, 2, modes);
+                counter += 2;
+                // For output, read the value, not what's at the address
+                outputAddr = read_operands(program, counter, 1, [1]);
+                counter += 1;
+                // console.debug("Multiplication", multOperands, outputAddr, modes)
+                program[outputAddr] = operands[0] * operands[1];
                 break;
             case 3:
-                let inputAddr = read_operands(program, counter + 1, 1)[0];
-                console.debug("Input", inputAddr)
-                program[inputAddr] = inputs[inputIdx++];
-                counter += 2;
+                // Read input
+                // For a store parameter, read the value, not what's at the address
+                outputAddr = read_operands(program, counter, 1, [1])[0];
+                // console.debug("Input", inputAddr)
+                program[outputAddr] = inputs[inputIdx++];
+                counter += 1;
                 break;
             case 4:
-                let outputVal = read_operands(program, counter + 1, 1)[0];
-                console.debug("Output", outputVal)
-                if (modes[0] == 1) {
-                    outputs.push(outputVal);
-                } else {
-                    outputs.push(program[outputVal]);
-                }
+                // Write output 
+                operands = read_operands(program, counter, 1, modes);
+                // console.debug("Output", outputAddr)
+
+                outputs.push(operands[0]);
+
+                counter += 1;
+                break;
+            case 5:
+                // Jump-if-true
+                operands = read_operands(program, counter, 2, modes)
                 counter += 2;
+                if (operands[0]) {
+                    counter = operands[1];
+                }
+                break;
+            case 6:
+                // Jump if false
+                operands = read_operands(program, counter, 2, modes)
+                counter += 2;
+                if (!operands[0]) {
+                    counter = operands[1];
+                }
+                break;
+            case 7:
+                // Less-than
+                operands = read_operands(program, counter, 2, modes)
+                counter += 2;
+                outputAddr = read_operands(program, counter, 1, [1])
+                counter += 1;
+                if (operands[0] < operands[1]) {
+                    program[outputAddr] = 1;
+                } else {
+                    program[outputAddr] = 0;
+                }
+                break;
+            case 8:
+                // Equality
+                operands = read_operands(program, counter, 2, modes)
+                counter += 2;
+                outputAddr = read_operands(program, counter, 1, [1])
+                counter += 1;
+                if (operands[0] == operands[1]) {
+                    program[outputAddr] = 1;
+                } else {
+                    program[outputAddr] = 0;
+                }
                 break;
             case 99:
-                 console.debug("Halt")
+                console.debug("Halt")
                 return outputs;
             default:
-                alert(`Unexpected opcode ${opcode}`);
+                console.error("Unexpected opcode", opcode)
+                alert(`Unexpected opcode!`);
                 break;
         }
 

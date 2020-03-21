@@ -25,7 +25,7 @@ export function setup() {
         }
         results += "</tr>"
     }
-    results  += "</table>";
+    results += "</table>";
     document.getElementById("results").innerHTML = results
 
     // Now add the event handlers for the buttons.
