@@ -1,13 +1,14 @@
 
 /// Initialiation
 const NUM_DAYS = 25;
-const AVAILABLE_DAYS = 5;
+const AVAILABLE_DAYS = 6;
 
 import { run_day1, tests_day1 } from './day1.js';
 import { run_day2, tests_day2 } from './day2.js';
 import { run_day3, tests_day3 } from './day3.js';
 import { run_day4, tests_day4 } from './day4.js';
 import { run_day5, tests_day5 } from './day5.js';
+import { run_day6, tests_day6 } from './day6.js';
 
 export function setup() {
     console.log("Running setup")
@@ -52,6 +53,10 @@ export function setup() {
                 runFn = run_day5;
                 testFn = tests_day5;
                 break;
+            case 6:
+                runFn = run_day6;
+                testFn = tests_day6;
+                break; 
             default:
                 break;
         }
