@@ -1,13 +1,14 @@
-import { read_text_input, test_assert } from "./utils.js";
-import { run_program, test_program } from "./intcode.js";
+import { read_text_input } from "./utils.js";
+import { test_program, IntCode } from "./intcode.js";
 
 function run_gravity_assist(program, noun, verb) {
     // Take a copy of the program.
     let memory = program.slice();
     memory[1] = noun;
     memory[2] = verb;
-    run_program(memory);
-    return memory[0]
+    let GravComputer = new IntCode(memory, [])
+    GravComputer.run();
+    return GravComputer.memory[0]
 }
 
 function look_for_output(program) {
