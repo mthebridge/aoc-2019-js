@@ -9,14 +9,39 @@ export function *arrayInputGenerator(arr) {
 }
 
 export class IntCode {
-    constructor(program, inputGenerator) {
+    constructor(program, inputGenerator, name) {
         // Initialize memory with a copy of the program
         this.memory = program.slice()
         // Inputs.  This is an iterable that may be asynchronous.
         this.inputGenerator = inputGenerator
         this.outputs = []
         this.programCounter = 0
+        this.halted = false
+        this.name = name
     }
+
+    async *outputIterator() {
+        let idx = 0        
+
+        function sleep(duration) {
+            return new Promise(resolve => setTimeout(resolve, duration)) 
+        }
+
+        while (!this.halted) {                
+            // console.debug(`${this.name}: Another loop, idx: ${idx}, outputs: ${this.outputs.length}`)       
+            while (((idx >= this.outputs.length) || (typeof this.outputs[idx] == 'undefined')) && !this.halted) {               
+                // No outputs. Wait for 10ms. 
+                // console.debug(`${this.name}: Waiting 100ms for ${idx}th output`)                 
+                await sleep(10)                  
+            }
+            
+            let nextOut = this.outputs[idx]
+            // console.debug(`${this.name}: Yielding an output`,  nextOut)
+            idx++
+            yield nextOut       
+            // console.debug(`${this.name}: Back to outer loop`)                     
+        }
+    }    
 
     read_operands(numOperands, modes) {
         let operands = [];
@@ -41,7 +66,7 @@ export class IntCode {
     readMemoryAddress(address) {
         let res = parseInt(this.memory[address])
         if (isNaN(res)) {            
-            throw `Invalid operand at address ${address}: ${this.memory[address]}`
+            throw `${this.name}: Invalid operand at address ${address}: ${this.memory[address]}`
         }
         
         return res;
@@ -54,8 +79,8 @@ export class IntCode {
 
         while (this.programCounter < MAX_COUNTER) {
             let instruction = this.readProgramCounter();            
-            //console.debug("Opcode:", opcode)
             let opcode = instruction % 100;
+            // console.debug(`${this.name}: Opcode:`, opcode)
             let modes = []
             let operands;
             let outputAddr;
@@ -86,13 +111,20 @@ export class IntCode {
                     // Read input
                     // For a store parameter, read the value, not what's at the address
                     outputAddr = this.read_operands( 1, [1])[0];
-                    this.memory[outputAddr] = await this.inputGenerator.next().value;                    
+                    // console.log(`${this.name}:  Try to read input, address: ${outputAddr}`)
+                    let nextOut = await this.inputGenerator.next()
+                    // console.log(`${this.name}:  Next input`, nextOut)
+                    if (nextOut.done) {
+                        throw "No more inputs"
+                    } else {
+                        this.memory[outputAddr] = nextOut.value;                    
+                    }
                     // console.debug("Input was", this.memory[outputAddr])
                     break;
                 case 4:
                     // Write output 
                     operands = this.read_operands(1, modes);
-                    // console.debug("Output", outputAddr)
+                    // console.debug(`${this.name}: Output`, operands[0])
                     this.outputs.push(operands[0]);
                     
                     break;
@@ -134,7 +166,8 @@ export class IntCode {
                     }
                     break;
                 case 99:
-                    console.debug("Halt")
+                    // console.debug("Halt")
+                    this.halted = true
                     return;
                 default:
                     console.error("Unexpected opcode", opcode)
