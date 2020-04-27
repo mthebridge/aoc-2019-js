@@ -5,7 +5,7 @@ import { test_assert } from "./utils.js";
 export function *arrayInputGenerator(arr) {
     for (let i = 0; i < arr.length; i++) {
         yield arr[i];
-    }    
+    }
 }
 
 export class IntCode {
@@ -21,27 +21,27 @@ export class IntCode {
     }
 
     async *outputIterator() {
-        let idx = 0        
+        let idx = 0
 
         function sleep(duration) {
-            return new Promise(resolve => setTimeout(resolve, duration)) 
+            return new Promise(resolve => setTimeout(resolve, duration))
         }
 
-        while (!this.halted) {                
-            // console.debug(`${this.name}: Another loop, idx: ${idx}, outputs: ${this.outputs.length}`)       
-            while (((idx >= this.outputs.length) || (typeof this.outputs[idx] == 'undefined')) && !this.halted) {               
-                // No outputs. Wait for 10ms. 
-                // console.debug(`${this.name}: Waiting 100ms for ${idx}th output`)                 
-                await sleep(10)                  
+        while (!this.halted) {
+            // console.debug(`${this.name}: Another loop, idx: ${idx}, outputs: ${this.outputs.length}`)
+            while (((idx >= this.outputs.length) || (typeof this.outputs[idx] == 'undefined')) && !this.halted) {
+                // No outputs. Wait for 10ms.
+                // console.debug(`${this.name}: Waiting 100ms for ${idx}th output`)
+                await sleep(2)
             }
-            
+
             let nextOut = this.outputs[idx]
             // console.debug(`${this.name}: Yielding an output`,  nextOut)
             idx++
-            yield nextOut       
-            // console.debug(`${this.name}: Back to outer loop`)                     
+            yield nextOut
+            // console.debug(`${this.name}: Back to outer loop`)
         }
-    }    
+    }
 
     read_operands(numOperands, modes) {
         let operands = [];
@@ -62,23 +62,23 @@ export class IntCode {
         this.programCounter += 1;
         return res
     }
-    
+
     readMemoryAddress(address) {
         let res = parseInt(this.memory[address])
-        if (isNaN(res)) {            
+        if (isNaN(res)) {
             throw `${this.name}: Invalid operand at address ${address}: ${this.memory[address]}`
         }
-        
+
         return res;
     }
 
-    /// Run the program.  
+    /// Run the program.
     async run(program) {
         // Prevent infinte loops...
         const MAX_COUNTER = 50000;
 
         while (this.programCounter < MAX_COUNTER) {
-            let instruction = this.readProgramCounter();            
+            let instruction = this.readProgramCounter();
             let opcode = instruction % 100;
             // console.debug(`${this.name}: Opcode:`, opcode)
             let modes = []
@@ -93,9 +93,9 @@ export class IntCode {
             switch (opcode) {
                 case 1:
                     // Addition
-                    operands = this.read_operands(2, modes);                   
+                    operands = this.read_operands(2, modes);
                     // For output, read the value, not what's at the address
-                    outputAddr = this.read_operands(1, [1]);                  
+                    outputAddr = this.read_operands(1, [1]);
                     // console.debug("Addition", addOperands, outputAddr, modes)
                     this.memory[outputAddr] = operands[0] + operands[1];
                     break;
@@ -117,21 +117,21 @@ export class IntCode {
                     if (nextOut.done) {
                         throw "No more inputs"
                     } else {
-                        this.memory[outputAddr] = nextOut.value;                    
+                        this.memory[outputAddr] = nextOut.value;
                     }
                     // console.debug("Input was", this.memory[outputAddr])
                     break;
                 case 4:
-                    // Write output 
+                    // Write output
                     operands = this.read_operands(1, modes);
                     // console.debug(`${this.name}: Output`, operands[0])
                     this.outputs.push(operands[0]);
-                    
+
                     break;
                 case 5:
                     // Jump-if-true
                     operands = this.read_operands(2, modes)
-                    
+
                     if (operands[0]) {
                         this.programCounter = operands[1];
                     }
@@ -139,7 +139,7 @@ export class IntCode {
                 case 6:
                     // Jump if false
                     operands = this.read_operands(2, modes)
-                    
+
                     if (!operands[0]) {
                         this.programCounter = operands[1];
                     }
@@ -147,8 +147,8 @@ export class IntCode {
                 case 7:
                     // Less-than
                     operands = this.read_operands(2, modes)
-                    
-                    outputAddr = this.read_operands(1, [1])                    
+
+                    outputAddr = this.read_operands(1, [1])
                     if (operands[0] < operands[1]) {
                         this.memory[outputAddr] = 1;
                     } else {
@@ -157,8 +157,8 @@ export class IntCode {
                     break;
                 case 8:
                     // Equality
-                    operands = this.read_operands(2, modes)                    
-                    outputAddr = this.read_operands(1, [1])                    
+                    operands = this.read_operands(2, modes)
+                    outputAddr = this.read_operands(1, [1])
                     if (operands[0] == operands[1]) {
                         this.memory[outputAddr] = 1;
                     } else {
