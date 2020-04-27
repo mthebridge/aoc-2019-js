@@ -18,6 +18,7 @@ export class IntCode {
     this.programCounter = 0;
     this.halted = false;
     this.name = name;
+    this.relativeBase = 0;
   }
 
   read_operands(numOperands, modes) {
@@ -26,6 +27,9 @@ export class IntCode {
       let value = this.readProgramCounter();
       if (modes[i] == 1) {
         operands.push(value);
+      } else if (modes[i] == 2) {
+        // Add the relative base.
+        operands.push(this.readMemoryAddress(this.relativeBase + value));
       } else {
         operands.push(this.readMemoryAddress(value));
       }
@@ -41,6 +45,13 @@ export class IntCode {
   }
 
   readMemoryAddress(address) {
+    if (address < 0) {
+      throw `${this.name}Cannot access negative address ${address}`
+    }
+    if (address >= this.memory.length) {
+      // Memory not yet accessed - initialize to zero.
+      this.memory[address] = 0;
+    }
     let res = parseInt(this.memory[address]);
     if (isNaN(res)) {
       throw `${this.name}: Invalid operand at address ${address}: ${this.memory[address]}`;
@@ -141,6 +152,11 @@ export class IntCode {
           } else {
             this.memory[outputAddr] = 0;
           }
+          break;
+        case 9:
+          // Relative base shift
+          operands = this.read_operands(1, modes);
+          this.relativeBase += operands[0];
           break;
         case 99:
           // console.debug("Halt")
