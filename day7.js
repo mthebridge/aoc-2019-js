@@ -13,8 +13,29 @@ async function* ampInputGenerator(prevAmp, phase, isInit) {
   }
 
   // Now yield the outputs of the previous amp
-  let ourInputs = prevAmp.outputIterator();
-  yield* await ourInputs;
+  //
+  // TODO: this sleeping is ugly and slows things down - would be nicer
+  // to use event callbacks - try out https://stackoverflow.com/questions/43084557/using-promises-to-await-triggered-events
+  // or similar?
+  function sleep(duration) {
+    return new Promise(resolve => setTimeout(resolve, duration))
+  }
+  let idx = 0;
+
+  while (!prevAmp.halted) {
+    // console.debug(`${this.name}: Another loop, idx: ${idx}, outputs: ${prevAmp.outputs.length}`)
+    while (((idx >= prevAmp.outputs.length) || (typeof prevAmp.outputs[idx] == 'undefined')) && !prevAmp.halted) {
+        // No outputs yet. Wait for a short while.
+        // console.debug(`${prevAmp.name}: Waiting 2ms for ${idx}th output`)
+        await sleep(2)
+    }
+
+    let nextOut = prevAmp.outputs[idx]
+    // console.debug(`${prevAmp.name}: Yielding an output`,  nextOut)
+    idx++
+    yield nextOut
+    // console.debug(`${prevAmp.name}: Back to outer loop`)
+  }
 }
 
 // Run the sequence of amplifiers
