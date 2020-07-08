@@ -1,6 +1,6 @@
 body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-  background-color: lightgreen;
+  background-color: palegoldenrod;
   color: red;
 }
 
@@ -9,6 +9,23 @@ h1 {
 }
 
 table.results {
-  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  border: none;
+  table-layout: fixed; 
   text-align: left;
+}
+
+td {
+  border-width: 0px;
+  border-collapse: collapse;  
+  border: none;
+}
+
+tr:nth-child(odd) {
+  background-color: palegreen;
+}
+
+tr:nth-child(even) {
+  background-color: lightgreen;
 }

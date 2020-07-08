@@ -7,14 +7,195 @@
     <title>Advent of Code 2019 - Solutions</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+
     <script type=module>
        import {setup} from "./setup.js";
        document.onload = setup();
     </script>
 </head>
+
 <body>
     <h1>JS Advent Of Code 2019</h1>
-    <div id=results class=results></div>
+    <p style="text-align:center"><a href="https://adventofcode.com/2019/">Help Save Santa!</a></p>
+    <div id=results class=results>
+        <table width="100%">
+            <tr>
+                <td width="10%">Day 1</td>
+                <td width="5%"><button id="button-day1" type="button">Solve!</button></td>
+                <td width="55%"><span id="day1">???</span></td>
+                <td width="5%"><button id="button-tests1" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests1">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 2</td>
+                <td width="5%"><button id="button-day2" type="button">Solve!</button></td>
+                <td width="55%"><span id="day2">???</span></td>
+                <td width="5%"><button id="button-tests2" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests2">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 3</td>
+                <td width="5%"><button id="button-day3" type="button">Solve!</button></td>
+                <td width="55%"><span id="day3">???</span></td>
+                <td width="5%"><button id="button-tests3" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests3">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 4</td>
+                <td width="5%"><button id="button-day4" type="button">Solve!</button></td>
+                <td width="55%"><span id="day4">???</span></td>
+                <td width="5%"><button id="button-tests4" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests4">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 5</td>
+                <td width="5%"><button id="button-day5" type="button">Solve!</button></td>
+                <td width="55%"><span id="day5">???</span></td>
+                <td width="5%"><button id="button-tests5" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests5">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 6</td>
+                <td width="5%"><button id="button-day6" type="button">Solve!</button></td>
+                <td width="55%"><span id="day6">???</span></td>
+                <td width="5%"><button id="button-tests6" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests6">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 7</td>
+                <td width="5%"><button id="button-day7" type="button">Solve!</button></td>
+                <td width="55%"><span id="day7">???</span></td>
+                <td width="5%"><button id="button-tests7" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests7">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 8</td>
+                <td width="5%"><button id="button-day8" type="button">Solve!</button></td>
+                <td width="55%"><span id="day8">???</span></td>
+                <td width="5%"><button id="button-tests8" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests8">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 9</td>
+                <td width="5%"><button id="button-day9" type="button">Solve!</button></td>
+                <td width="55%"><span id="day9">???</span></td>
+                <td width="5%"><button id="button-tests9" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests9">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 10</td>
+                <td width="5%"><button id="button-day10" type="button">Solve!</button></td>
+                <td width="55%"><span id="day10">???</span></td>
+                <td width="5%"><button id="button-tests10" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests10">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 11</td>
+                <td width="5%"><button id="button-day11" type="button">Solve!</button></td>
+                <td width="55%"><span id="day11">???</span></td>
+                <td width="5%"><button id="button-tests11" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests11">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 12</td>
+                <td width="5%"><button id="button-day12" type="button">Solve!</button></td>
+                <td width="55%"><span id="day12">???</span></td>
+                <td width="5%"><button id="button-tests12" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests12">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 13</td>
+                <td width="5%"><button id="button-day13" type="button">Solve!</button></td>
+                <td width="55%"><span id="day13">???</span></td>
+                <td width="5%"><button id="button-tests13" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests13">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 14</td>
+                <td width="5%"><button id="button-day14" type="button">Solve!</button></td>
+                <td width="55%"><span id="day14">???</span></td>
+                <td width="5%"><button id="button-tests14" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests14">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 15</td>
+                <td width="5%"><button id="button-day15" type="button">Solve!</button></td>
+                <td width="55%"><span id="day15">???</span></td>
+                <td width="5%"><button id="button-tests15" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests15">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 16</td>
+                <td width="5%"><button id="button-day16" type="button">Solve!</button></td>
+                <td width="55%"><span id="day16">???</span></td>
+                <td width="5%"><button id="button-tests16" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests16">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 17</td>
+                <td width="5%"><button id="button-day17" type="button">Solve!</button></td>
+                <td width="55%"><span id="day17">???</span></td>
+                <td width="5%"><button id="button-tests17" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests17">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 18</td>
+                <td width="5%"><button id="button-day18" type="button">Solve!</button></td>
+                <td width="55%"><span id="day18">???</span></td>
+                <td width="5%"><button id="button-tests18" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests18">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 19</td>
+                <td width="5%"><button id="button-day19" type="button">Solve!</button></td>
+                <td width="55%"><span id="day19">???</span></td>
+                <td width="5%"><button id="button-tests19" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests19">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 20</td>
+                <td width="5%"><button id="button-day20" type="button">Solve!</button></td>
+                <td width="55%"><span id="day20">???</span></td>
+                <td width="5%"><button id="button-tests20" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests20">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 21</td>
+                <td width="5%"><button id="button-day21" type="button">Solve!</button></td>
+                <td width="55%"><span id="day21">???</span></td>
+                <td width="5%"><button id="button-tests21" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests21">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 22</td>
+                <td width="5%"><button id="button-day22" type="button">Solve!</button></td>
+                <td width="55%"><span id="day22">???</span></td>
+                <td width="5%"><button id="button-tests22" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests22">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 23</td>
+                <td width="5%"><button id="button-day23" type="button">Solve!</button></td>
+                <td width="55%"><span id="day23">???</span></td>
+                <td width="5%"><button id="button-tests23" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests23">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 24</td>
+                <td width="5%"><button id="button-day24" type="button">Solve!</button></td>
+                <td width="55%"><span id="day24">???</span></td>
+                <td width="5%"><button id="button-tests24" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests24">Not yet run</span></td>
+            </tr>
+            <tr>
+                <td width="10%">Day 25</td>
+                <td width="5%"><button id="button-day25" type="button">Solve!</button></td>
+                <td width="55%"><span id="day25">???</span></td>
+                <td width="5%"><button id="button-tests25" type="button">Unit tests!</button></td>
+                <td width="25%"><span id="tests25">Not yet run</span></td>
+            </tr>
+        </table>
+    </div>
 </body>
 
 </html>

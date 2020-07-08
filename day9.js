@@ -7,7 +7,7 @@ function run_day9() {
         let boostTest = new IntCode(program, arrayInputGenerator([1]), "BOOST program: test")
         let boostBoost = new IntCode(program, arrayInputGenerator([2]), "BOOST program: boost")
         Promise.all([boostTest.run(), boostBoost.run()]).then(() => {            
-            document.getElementById("day9").innerHTML = `BOOST test mode output: ${boostTest.outputs}, Sensort output: ${boostBoost.outputs}`;
+            document.getElementById("day9").innerHTML = `BOOST test mode output: <b>${boostTest.outputs}</b>, Sensor output: <b>${boostBoost.outputs}</b>`;
        })
     })
 }
