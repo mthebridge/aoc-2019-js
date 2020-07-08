@@ -21,17 +21,37 @@ export class IntCode {
     this.relativeBase = 0;
   }
 
+  // For an *output* parameter, we want to return the *address* rather than the value
+  read_output_address(mode) {
+    let value = this.readProgramCounter();
+    switch (mode) {
+      case 1:
+         throw "Immediate mode not valid for addresses"
+      case 2:
+        // Add the relative base.
+        // console.debug("Base, value, sum:", this.relativeBase, value, this.relativeBase + value)
+        return this.relativeBase + value  
+      default:
+        return value;        
+    }      
+  }
+
   read_operands(numOperands, modes) {
     let operands = [];
     for (let i = 0; i < numOperands; i++) {
       let value = this.readProgramCounter();
-      if (modes[i] == 1) {
-        operands.push(value);
-      } else if (modes[i] == 2) {
-        // Add the relative base.
-        operands.push(this.readMemoryAddress(this.relativeBase + value));
-      } else {
-        operands.push(this.readMemoryAddress(value));
+      switch (modes[i]) {          
+        case 1:
+           operands.push(value);
+           break;
+        case 2:
+          // Add the relative base.
+          operands.push(this.readMemoryAddress(this.relativeBase + value));
+          break;
+        default:
+          operands.push(this.readMemoryAddress(value));
+          break
+        
       }
     }
 
@@ -46,7 +66,7 @@ export class IntCode {
 
   readMemoryAddress(address) {
     if (address < 0) {
-      throw `${this.name}Cannot access negative address ${address}`
+      throw `${this.name} Cannot access negative address ${address}`
     }
     if (address >= this.memory.length) {
       // Memory not yet accessed - initialize to zero.
@@ -77,35 +97,36 @@ export class IntCode {
         modes.push(ret % 10);
         ret = Math.floor(ret / 10);
       }
+      // console.debug(`${this.name}: Modes:`, modes)
 
       switch (opcode) {
         case 1:
           // Addition
           operands = this.read_operands(2, modes);
           // For output, read the value, not what's at the address
-          outputAddr = this.read_operands(1, [1]);
-          // console.debug("Addition", addOperands, outputAddr, modes)
+          outputAddr = this.read_output_address(modes[2]);
+          // console.debug("Addition", operands, outputAddr, modes)
           this.memory[outputAddr] = operands[0] + operands[1];
           break;
         case 2:
           // Multiplication
           operands = this.read_operands(2, modes);
           // For output, read the value, not what's at the address
-          outputAddr = this.read_operands(1, [1]);
-          // console.debug("Multiplication", multOperands, outputAddr, modes)
+          outputAddr = this.read_output_address(modes[2]);
+          // console.debug("Multiplication", operands, outputAddr, modes)
           this.memory[outputAddr] = operands[0] * operands[1];
           break;
         case 3:
           // Read input
           // For a store parameter, read the value, not what's at the address
-          outputAddr = this.read_operands(1, [1])[0];
+          outputAddr = this.read_output_address(modes[0]);
           // console.log(`${this.name}:  Try to read input, address: ${outputAddr}`)
-          let nextOut = await this.inputGenerator.next();
-          // console.log(`${this.name}:  Next input`, nextOut)
-          if (nextOut.done) {
+          let nextInput = await this.inputGenerator.next();
+          // console.log(`${this.name}:  Next input`, nextInput)
+          if (nextInput.done) {
             throw "No more inputs";
           } else {
-            this.memory[outputAddr] = nextOut.value;
+            this.memory[outputAddr] = nextInput.value;
           }
           // console.debug("Input was", this.memory[outputAddr])
           break;
@@ -136,7 +157,7 @@ export class IntCode {
           // Less-than
           operands = this.read_operands(2, modes);
 
-          outputAddr = this.read_operands(1, [1]);
+          outputAddr = this.read_output_address(modes[2]);
           if (operands[0] < operands[1]) {
             this.memory[outputAddr] = 1;
           } else {
@@ -146,7 +167,7 @@ export class IntCode {
         case 8:
           // Equality
           operands = this.read_operands(2, modes);
-          outputAddr = this.read_operands(1, [1]);
+          outputAddr = this.read_output_address(modes[2]);
           if (operands[0] == operands[1]) {
             this.memory[outputAddr] = 1;
           } else {
@@ -156,6 +177,7 @@ export class IntCode {
         case 9:
           // Relative base shift
           operands = this.read_operands(1, modes);
+          // console.debug("base shift by:", operands[0])
           this.relativeBase += operands[0];
           break;
         case 99:

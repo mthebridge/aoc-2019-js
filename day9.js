@@ -1,13 +1,13 @@
 import { read_text_input, test_assert } from "./utils.js";
-import { test_program, IntCode, arrayInputGenerator } from "./intcode.js";
+import { IntCode, arrayInputGenerator } from "./intcode.js";
 
 function run_day9() {
     read_text_input("inputs/day9.txt", (input) => {
         let program = input.split(",");
-        let boost = new IntCode(program, arrayInputGenerator([1]))
-        boost.run().then(() => {
-            console.log("Program outputs", boost.outputs)
-            document.getElementById("day9").innerHTML = `BOOST output: ${boost.outputs[0]}`;
+        let boostTest = new IntCode(program, arrayInputGenerator([1]), "BOOST program: test")
+        let boostBoost = new IntCode(program, arrayInputGenerator([2]), "BOOST program: boost")
+        Promise.all([boostTest.run(), boostBoost.run()]).then(() => {            
+            document.getElementById("day9").innerHTML = `BOOST test mode output: ${boostTest.outputs}, Sensort output: ${boostBoost.outputs}`;
        })
     })
 }

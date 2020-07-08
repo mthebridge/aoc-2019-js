@@ -11,8 +11,7 @@ function read_text_input(file, callback) {
     xhttp.send()
 }
 
-function test_assert(desc, a, b) {
-    console.log("Running test: " + desc)
+function assert(a, b) {
     if (a != b) {
         console.log("TEST FAILED:" + a + "!=" + b)
         return false
@@ -22,4 +21,9 @@ function test_assert(desc, a, b) {
     }
 }
 
-export { read_text_input, test_assert };
+function test_assert(desc, a, b) {
+    console.log("Running test: " + desc)
+    return assert(a, b)
+}
+
+export { read_text_input, test_assert, assert };

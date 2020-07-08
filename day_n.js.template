@@ -1,15 +1,17 @@
+// Replace {{n}} with the day number, then rename and save.
+// Solutions for AoC day {{n}}
 import { read_text_input, test_assert } from "./utils.js";
 
-function run_dayn() {
-    read_text_input("inputs/dayn.txt", (input) => {
-        document.getElementById("dayn").innerHTML = ``;
+function run_day{{n}}() {
+    read_text_input("inputs/day{{n}}.txt", (input) => {
+        document.getElementById("day{{n}}").innerHTML = ``;
     })
 }
 
-function tests_dayn() {
+function tests_day{{n}}() {
     let passes = 0;
-    document.getElementById("testsn").innerHTML = `${passes}/0 tests passed!`;
+    document.getElementById("tests{{n}}").innerHTML = `${passes}/0 tests passed!`;
 
 }
 
-export { run_dayn, tests_dayn };
+export { run_day{{n}}, tests_day{{n}} };
