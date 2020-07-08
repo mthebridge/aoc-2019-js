@@ -13,7 +13,7 @@ function read_text_input(file, callback) {
 
 function assert(a, b) {
     if (a != b) {
-        console.log("TEST FAILED:" + a + "!=" + b)
+        console.log("ASSERT FAILED:" + a + "!=" + b)
         return false
     } else {
         console.log("Test passed!")

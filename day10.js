@@ -70,9 +70,9 @@ class Asteroid {
 
 // Check if asteroid A visible from B.
 function checkVisibility(a, b, map) {
-    // console.debug(`Checking visibility from (${a.x}, ${a.y}) to (${b.x}, ${b.y})`);
-    let xdiff = a.x - b.x;  //6
-    let ydiff = a.y - b.y;  //-3
+    // console.debug(`Checking visibility from (${a.x}, ${a.y}) to (${b.x}, ${b.y})`); // 6,3 to 0,7
+    let xdiff = a.x - b.x;  // 6
+    let ydiff = a.y - b.y;  // -4
 
     // The asteroid is visible *unless* another blocks it.
     // For there to be an asteroid that blocks it, intermediate points on the map
@@ -100,48 +100,43 @@ function checkVisibility(a, b, map) {
         // for all i s.t  |x1 - y1| and |x2 - y2| are positive integer multiples of i        
         let range;
         let xmult = 0;
-        let ymult = 0;        
+        let ymult = 0;
         let foundMult = false;
+        let mindiff;
 
-        if (Math.abs(xdiff) > Math.abs(ydiff)) {  
-            // Closer on y-axis.
-            // Check if there is any common divisor.           
-            range = Math.abs(ydiff);
-            for (let i = 2; i <= range; i++) {
-                xmult = (xdiff/i);
-                ymult = (ydiff/i);
-                if (Number.isInteger(xmult) && Number.isInteger(ymult)) {
-                    foundMult = true;
-                    break;
-                }                                            
-            }                   
-        } else {   
-            // Closer on x-axis (or same).
-            // Check if there is any common divisor (apart from 1).           
-            range = Math.abs(xdiff);
-            for (let i = 2; i <= range; i++) {
-                xmult = (xdiff/i);
-                ymult = (ydiff/i);
-                if (Number.isInteger(xmult) && Number.isInteger(ymult)) {
-                    foundMult = true;
-                    break;
-                }                                            
-            }                   
+        if (Math.abs(xdiff) > Math.abs(ydiff)) {
+            // Closer on y-axis.            
+            mindiff = Math.abs(ydiff);
+        } else {
+            // Closer on x-axis (or same).            
+            mindiff = Math.abs(xdiff);
         }
-        // console.debug(`Diff ratio is ${div}`);
+
+        // We want to minimize the dvisor, so work downwards...
+        for (let i = mindiff; i > 1; i--) {
+            xmult = (xdiff / i);
+            ymult = (ydiff / i);
+            if (Number.isInteger(xmult) && Number.isInteger(ymult)) {
+                foundMult = true;
+                range = i;
+                break;
+            }
+        }
         if (!foundMult) {
             // No possible blockers.
             return true
-        }   
+        }
 
-        // The X and Y ratios share an integer multiple.  We need to check all posible spots between them.        
+        //xmult = 3, ymult == -2, range = 4
+
+        // The X and Y ratios share an integer multiple.  We need to check all possible spots between them.        
         for (let i = 1; i < range; i++) {
             const testx = b.x + (xmult * i);
             const testy = b.y + (ymult * i);
-            
+
             // console.debug(`Checking (${testx}, ${testy})...`)
             if (map.isAsteroid(testx, testy)) {
-                // console.debug(`Blocker at (${testx}, ${testy})`);
+                // console.dqebug(`Blocker at (${testx}, ${testy})`);
                 return false;
             }
         }
@@ -161,12 +156,12 @@ function run_day10() {
     })
 }
 
-function test_part1(idx, input, x, y) {
+function test_part1(idx, input, x, y, max) {
     console.log(`Running test 1.${idx}`)
     let map = new Map(input);
     map.countVisibilities();
     let best = map.findBestStation();
-    return (assert(best.x, x) && assert(best.y, y))
+    return (assert(best.x, x) && assert(best.y, y) && assert(best.visibles.length, max))
 
 }
 
@@ -179,7 +174,7 @@ function tests_day10() {
             "#####",
             "....#",
             "...##"].join("\n"),
-        3, 4
+        3, 4, 8
     )
 
     passes += test_part1(2,
@@ -192,7 +187,22 @@ function tests_day10() {
             "#..#....#.",
             ".##.#..###",
             "##...#..#.",
-            ".#....####"].join("\n"), 5, 8);
+            ".#....####"].join("\n"), 5, 8, 33);
+
+
+    passes += test_part1(3,
+        ["#.#...#.#.",
+            ".###....#.",
+            ".#....#...",
+            "##.#.#.#.#",
+            "....#.#.#.",
+            ".##..###.#",
+            "..#...##..",
+            "..##....##",
+            "......#...",
+            ".####.###."
+        ].join("\n"), 1, 2, 35);
+
     passes += test_part1(4,
         [".#..#..###",
             "####.###.#",
@@ -204,9 +214,33 @@ function tests_day10() {
             "#..#.#.###",
             ".##...##.#",
             ".....#.#.."
-        ].join("\n"), 6, 3);
+        ].join("\n"), 6, 3, 41);
 
-    document.getElementById("tests10").innerHTML = `${passes}/3 tests passed!`;
+    passes += test_part1(5,
+        [
+            ".#..##.###...#######",
+            "##.############..##.",
+            ".#.######.########.#",
+            ".###.#######.####.#.",
+            "#####.##.#.##.###.##",
+            "..#####..#.#########",
+            "####################",
+            "#.####....###.#.#.##",
+            "##.#################",
+            "#####.##.###..####..",
+            "..######..##.#######",
+            "####.##.####...##..#",
+            ".#####..#.######.###",
+            "##...#.##########...",
+            "#.##########.#######",
+            ".####.#.###.###.#.##",
+            "....##.##.###..#####",
+            ".#.#.###########.###",
+            "#.#.#.#####.####.###",
+            "###.##.####.##.#..##"
+        ].join("\n"), 11, 13, 210);
+
+    document.getElementById("tests10").innerHTML = `${passes}/5 tests passed!`;
 
 }
 
