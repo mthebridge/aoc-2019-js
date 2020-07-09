@@ -15,7 +15,8 @@ import { run_day10, tests_day10 } from './day10.js';
 // import { run_day{{n}}, tests_day{{n}} } from './day{{n}}.js';
 
 export function setup() {
-    console.log("Running setup")    
+    console.log("Running setup")
+    console.debug(`${Math.sign(0/-1)}, ${Math.sign(0)}`)   
     // Now add the event handlers for the buttons.
     let runFn, testFn;
     for (let i = 1; i <= AVAILABLE_DAYS; i++) {

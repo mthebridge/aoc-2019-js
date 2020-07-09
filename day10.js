@@ -67,58 +67,66 @@ class Asteroid {
     }
 }
 
- // Calculate the order of vaporization of visible asteroids.
- function getVaporizeOrder(station) {
+// Calculate the order of vaporization of visible asteroids.
+function getVaporizeOrder(station) {
     let targets = station.visibles.slice();
     // Sort the visible asteroids.
 
-    targets.sort(function(a, b) {
+    targets.sort(function (a, b) {
         // We need to sort by angle. Start by handling 4 quadrants.
         // Translate coords relative to station.
-        let ax = a.x - station.x; //-1
-        let ay = a.y - station.y; //0 
-        let bx = b.x - station.x; //-1
-        let by = b.y - station.y; // 6
+        let ax = a.x - station.x; // -1
+        let ay = a.y - station.y; //  0
+        let bx = b.x - station.x; // -11
+        let by = b.y - station.y; // 1
+        console.debug(`comparing (${ax}, ${ay}) with (${bx}, ${by})`);
 
         // Get the sign of each coordinate.
-        let axsign = Math.sign(ax);
-        let aysign = Math.sign(ay);
-        let bxsign = Math.sign(bx);
-        let bysign = Math.sign(by);
-        if (axsign != bxsign) {
-            // Clockwise from up, so positive X goes (before negative X) - hence return a-b
-            return axsign - bxsign
+        let axpos = (ax >= 0);
+        let aypos = (ay >= 0);
+        let bxpos = (bx >= 0);
+        let bypos = (by >= 0);
+        if (axpos != bxpos) {
+            // Clockwise from up, so positive X goes before negative X - hence return +1 if B is on LHS
+            if (bxpos) { return -1 } else { return 1 }
         }
 
-        if (aysign != bysign) {
+        if (aypos != bypos) {
             // Clockwise from up, so (-X, +Y) after -Y but (+X, +Y) before it.
-            if (aysign < 0) {                    
-                // A is bottom half - return negative sign of X coord
-                return -bxsign
+            if (bypos) {
+                // A is bottom half - return negative sign of X coord  
+                if (bxpos) { return -1 } else { return 1 }
             } else {
-                // B is bottom half - return sign of X coord
-                return axsign
+                // B is bottom half - return sign of X coord        
+                if (bxpos) { return 1 } else { return -1 }
             }
         }
 
         // Signs all match. 
-        if (axsign > 0 && aysign > 0) {
-            // NE quadrant.  Sort by Y/X with high first.
-            return (b.y/b.x - a.y/a.x)
-        }
-        if (axsign > 0 && aysign < 0) {
-            // SE quadrant.  Sort by X/Y with high first.
-            return (a.x/a.y - b.x/b.y)
-        }
-        if (axsign < 0 && aysign < 0) {
-            // SW quadrant.  Sort by Y/X with high first.
-            return (b.y/b.x - a.y/a.x)
-        }
-        if (axsign < 0 && aysign > 0) {
-            // NW quadrant.  Sort by X/Y with high first.
-            return (a.x/a.y - b.x/b.y)
+        // Determine gradient.
+        let agrad; // 0
+        let bgrad; // -1/11
+        if (ax == 0) {
+            // Use a large number for vertical (infintie gradient)
+            agrad = 99999
+        } else {
+            agrad = ay / ax
         }
 
+        if (bx == 0) {
+            // Use a large number for vertical (infinite gradient)
+            bgrad = 99999
+        } else {
+            bgrad = by / bx
+        }
+
+        if (axpos) {
+            // RHS - high gradients first.
+            return (agrad - bgrad)
+        } else {
+            // LHS - low gradients first
+            return (bgrad - agrad)
+        }
     })
     return targets
 }
@@ -220,12 +228,12 @@ function test_part1(idx, input, x, y, max) {
     console.log(`Running test 1.${idx}`)
     let map = new Map(input);
     map.countVisibilities();
-    let best = map.findBestStation();    
+    let best = map.findBestStation();
     return (assert(best.x, x) && assert(best.y, y) && assert(best.visibles.length, max))
 }
 
-function test_part2(input, x, y) {   
-    console.log(`Running test 2`) 
+function test_part2(input, x, y) {
+    console.log(`Running test 2`)
     let map = new Map(input);
     map.countVisibilities();
     let best = map.findBestStation();
@@ -308,30 +316,30 @@ function tests_day10() {
             "###.##.####.##.#..##"
         ].join("\n"), 11, 13, 210);
 
-        // Same map as 1.5
-        passes += test_part2(
-            [
-                ".#..##.###...#######",
-                "##.############..##.",
-                ".#.######.########.#",
-                ".###.#######.####.#.",
-                "#####.##.#.##.###.##",
-                "..#####..#.#########",
-                "####################",
-                "#.####....###.#.#.##",
-                "##.#################",
-                "#####.##.###..####..",
-                "..######..##.#######",
-                "####.##.####...##..#",
-                ".#####..#.######.###",
-                "##...#.##########...",
-                "#.##########.#######",
-                ".####.#.###.###.#.##",
-                "....##.##.###..#####",
-                ".#.#.###########.###",
-                "#.#.#.#####.####.###",
-                "###.##.####.##.#..##"
-            ].join("\n"), 8, 2);
+    // Same map as 1.5
+    passes += test_part2(
+        [
+            ".#..##.###...#######",
+            "##.############..##.",
+            ".#.######.########.#",
+            ".###.#######.####.#.",
+            "#####.##.#.##.###.##",
+            "..#####..#.#########",
+            "####################",
+            "#.####....###.#.#.##",
+            "##.#################",
+            "#####.##.###..####..",
+            "..######..##.#######",
+            "####.##.####...##..#",
+            ".#####..#.######.###",
+            "##...#.##########...",
+            "#.##########.#######",
+            ".####.#.###.###.#.##",
+            "....##.##.###..#####",
+            ".#.#.###########.###",
+            "#.#.#.#####.####.###",
+            "###.##.####.##.#..##"
+        ].join("\n"), 8, 2);
 
     document.getElementById("tests10").innerHTML = `${passes}/6 tests passed!`;
 
