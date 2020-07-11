@@ -15,7 +15,7 @@ class Map {
         for (let r = 0; r < rows.length; r++) {
             const row = rows[r];
             for (let c = 0; c < row.length; c++) {
-                // This will index the point in the map  by (row * width) + column.                
+                // This will index the point in the map  by (row * width) + column.
                 if (row.charAt(c) == '#') {
                     this.map.push(true)
                     this.asteroids.push(new Asteroid(c, r));
@@ -87,46 +87,43 @@ function getVaporizeOrder(station) {
         let bxpos = (bx >= 0);
         let bypos = (by >= 0);
         if (axpos != bxpos) {
-            // Clockwise from up, so positive X goes before negative X - hence return +1 if B is on LHS
-            if (bxpos) { return -1 } else { return 1 }
+            // Clockwise from up, so positive X goes before negative X - hence return +1 if B is on RHS
+            if (bxpos) { return 1 } else { return -1 }
         }
 
         if (aypos != bypos) {
             // Clockwise from up, so (-X, +Y) after -Y but (+X, +Y) before it.
             if (bypos) {
-                // A is bottom half - return negative sign of X coord  
+                // A is bottom half - return negative sign of X coord
                 if (bxpos) { return -1 } else { return 1 }
             } else {
-                // B is bottom half - return sign of X coord        
+                // B is bottom half - return sign of X coord
                 if (bxpos) { return 1 } else { return -1 }
             }
         }
 
-        // Signs all match. 
+        // Signs all match.
         // Determine gradient.
         let agrad; // 0
         let bgrad; // -1/11
         if (ax == 0) {
-            // Use a large number for vertical (infintie gradient)
-            agrad = 99999
+            // Use a large number for vertical (infinite gradient)
+            if (aypos) { agrad = 999999 } else { agrad = -999999 }
         } else {
             agrad = ay / ax
         }
 
         if (bx == 0) {
             // Use a large number for vertical (infinite gradient)
-            bgrad = 99999
+            if (bypos) { bgrad = 999999 } else { bgrad = -999999 }
+
         } else {
             bgrad = by / bx
         }
 
-        if (axpos) {
-            // RHS - high gradients first.
-            return (agrad - bgrad)
-        } else {
-            // LHS - low gradients first
-            return (bgrad - agrad)
-        }
+        // The gradients are sorted such that in each quadrant the low gradients come first.
+        return (agrad - bgrad)
+
     })
     return targets
 }
@@ -139,7 +136,7 @@ function checkVisibility(a, b, map) {
 
     // The asteroid is visible *unless* another blocks it.
     // For there to be an asteroid that blocks it, intermediate points on the map
-    // must be asteroids.         
+    // must be asteroids.
     if (xdiff == 0) {
         // Same column
         for (let i = 1; i < Math.abs(ydiff); i++) {
@@ -156,11 +153,11 @@ function checkVisibility(a, b, map) {
             }
         }
     } else {
-        // Not samw row or column.  
+        // Not samw row or column.
         // Any blockers must be positioned on a straight line bwteen the two points.
         // the set of blockers between (x1, y1) and (x2, y2) are at:
         //   (x1 + i, y1 + i)
-        // for all i s.t  |x1 - y1| and |x2 - y2| are positive integer multiples of i        
+        // for all i s.t  |x1 - y1| and |x2 - y2| are positive integer multiples of i
         let range;
         let xmult = 0;
         let ymult = 0;
@@ -168,10 +165,10 @@ function checkVisibility(a, b, map) {
         let mindiff;
 
         if (Math.abs(xdiff) > Math.abs(ydiff)) {
-            // Closer on y-axis.            
+            // Closer on y-axis.
             mindiff = Math.abs(ydiff);
         } else {
-            // Closer on x-axis (or same).            
+            // Closer on x-axis (or same).
             mindiff = Math.abs(xdiff);
         }
 
@@ -192,7 +189,7 @@ function checkVisibility(a, b, map) {
 
         //xmult = 3, ymult == -2, range = 4
 
-        // The X and Y ratios share an integer multiple.  We need to check all possible spots between them.        
+        // The X and Y ratios share an integer multiple.  We need to check all possible spots between them.
         for (let i = 1; i < range; i++) {
             const testx = b.x + (xmult * i);
             const testy = b.y + (ymult * i);
@@ -215,9 +212,9 @@ function run_day10() {
         map.countVisibilities();
         let best = map.findBestStation();
 
-        // For part2 - we need to 
+        // For part2 - we need to
         let vaporizeOrder = getVaporizeOrder(best);
-        let vap200 = vaporizeOrder[200];
+        let vap200 = vaporizeOrder[199];
 
         document.getElementById("day10").innerHTML = `Best station is at (${best.x}, ${best.y}) - ${best.visibles.length} asteroids in sight.<br/>
           200th asteroid vaporized is at (${vap200.x}, ${vap200.y}).`;
@@ -232,17 +229,52 @@ function test_part1(idx, input, x, y, max) {
     return (assert(best.x, x) && assert(best.y, y) && assert(best.visibles.length, max))
 }
 
+function test_sort() {
+    let station = new Asteroid(4, 4);
+    const inputs = [
+        new Asteroid(0, 1),
+        new Asteroid(0, 4),
+        new Asteroid(0, 6),
+        new Asteroid(3, 2),
+        new Asteroid(3, 8),
+        new Asteroid(4, 2),
+        new Asteroid(4, 7),
+        new Asteroid(5, 1),
+        new Asteroid(5, 4),
+        new Asteroid(5, 5),
+    ]
+    station.visibles = inputs
+    let sorted = getVaporizeOrder(station);
+    let correct = 0;
+    correct += (assert(sorted[0].x, inputs[5].x) && assert(sorted[0].y, inputs[5].y))
+    correct += (assert(sorted[1].x, inputs[7].x) && assert(sorted[1].y, inputs[7].y))
+    correct += (assert(sorted[2].x, inputs[8].x) && assert(sorted[2].y, inputs[8].y))
+    correct += (assert(sorted[3].x, inputs[9].x) && assert(sorted[3].y, inputs[9].y))
+    correct += (assert(sorted[4].x, inputs[6].x) && assert(sorted[4].y, inputs[6].y))
+    correct += (assert(sorted[5].x, inputs[4].x) && assert(sorted[5].y, inputs[4].y))
+    correct += (assert(sorted[6].x, inputs[2].x) && assert(sorted[6].y, inputs[2].y))
+    correct += (assert(sorted[7].x, inputs[1].x) && assert(sorted[7].y, inputs[1].y))
+    correct += (assert(sorted[8].x, inputs[0].x) && assert(sorted[8].y, inputs[0].y))
+    correct += (assert(sorted[9].x, inputs[3].x) && assert(sorted[9].y, inputs[3].y))
+
+    console.log(`Number correct: ${correct}/10`)
+    return assert(correct, 10)
+}
+
 function test_part2(input, x, y) {
     console.log(`Running test 2`)
     let map = new Map(input);
     map.countVisibilities();
     let best = map.findBestStation();
-    let vap = getVaporizeOrder(best)[200]
+    // 200th asteroid is index 199
+    let vap = getVaporizeOrder(best)[199]
     return (assert(vap.x, x) && assert(vap.y, y))
 }
 
 function tests_day10() {
     let passes = 0;
+
+    passes += test_sort();
 
     passes += test_part1(1,
         [".#..#",
@@ -341,7 +373,7 @@ function tests_day10() {
             "###.##.####.##.#..##"
         ].join("\n"), 8, 2);
 
-    document.getElementById("tests10").innerHTML = `${passes}/6 tests passed!`;
+    document.getElementById("tests10").innerHTML = `${passes}/7 tests passed!`;
 
 }
 
