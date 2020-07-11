@@ -1,0 +1,43 @@
+#display {
+    background: black;
+    max-width: 80%;
+}
+
+.grid {
+    border: 5px solid green;
+    display: grid;
+    grid-gap: 0px;
+    justify-content: center;
+    align-content: center;
+}
+
+.cell {
+    width: 20px;
+    height: 20px;
+}
+
+.empty {
+    background-color: transparent;
+}
+
+.wall {
+   background-image: linear-gradient(to bottom right, gray, lightgray);
+
+}
+
+.block {
+    background-image: linear-gradient(to bottom right, red, orange);
+}
+
+.paddle {
+    background-color: yellow;
+    border-width: 5px 0px;
+    border-style: solid;
+    border-color: black;
+}
+
+.ball {
+    background-image: radial-gradient(circle, white, lightgray, darkgray);
+    border-color: black;
+    border-radius: 50%;
+}
