@@ -1,6 +1,6 @@
 
 /// Initialiation
-const AVAILABLE_DAYS = 10;
+const AVAILABLE_DAYS = 11;
 
 import { run_day1, tests_day1 } from './day1.js';
 import { run_day2, tests_day2 } from './day2.js';
@@ -12,11 +12,12 @@ import { run_day7, tests_day7 } from './day7.js';
 import { run_day8, tests_day8 } from './day8.js';
 import { run_day9, tests_day9 } from './day9.js';
 import { run_day10, tests_day10 } from './day10.js';
+import { run_day11, tests_day11 } from './day11.js';
 // import { run_day{{n}}, tests_day{{n}} } from './day{{n}}.js';
 
 export function setup() {
     console.log("Running setup")
-    console.debug(`${Math.sign(0/-1)}, ${Math.sign(0)}`)   
+    console.debug(`${Math.sign(0/-1)}, ${Math.sign(0)}`)
     // Now add the event handlers for the buttons.
     let runFn, testFn;
     for (let i = 1; i <= AVAILABLE_DAYS; i++) {
@@ -60,6 +61,10 @@ export function setup() {
             case 10:
                 runFn = run_day10;
                 testFn = tests_day10;
+                break;
+            case 11:
+                runFn = run_day11;
+                testFn = tests_day11;
                 break;
             // case {{n}}:
             //     runFn = run_day{{n}};
