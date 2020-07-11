@@ -26,4 +26,24 @@ function test_assert(desc, a, b) {
     return assert(a, b)
 }
 
-export { read_text_input, test_assert, assert };
+function renderImage(imageData, imageWidth)  {
+    // Create a simple div!
+    let outHtml = "<pre>\n"
+    imageData.forEach((colour, index) => {
+        let colourString;
+        if (colour == "0") {
+            colourString = "white"
+        }
+        if (colour == "1") {
+            colourString = "black"
+        }
+        outHtml += `<span style="background-color:${colourString}"> </span>`
+        if ((index % imageWidth) == imageWidth - 1) {
+            outHtml += "\n"
+        }
+    })
+    outHtml += "\n</pre>"
+    return outHtml
+}
+
+export { read_text_input, test_assert, assert, renderImage };

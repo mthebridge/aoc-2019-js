@@ -30,17 +30,17 @@ export class IntCode {
       case 2:
         // Add the relative base.
         // console.debug("Base, value, sum:", this.relativeBase, value, this.relativeBase + value)
-        return this.relativeBase + value  
+        return this.relativeBase + value
       default:
-        return value;        
-    }      
+        return value;
+    }
   }
 
   read_operands(numOperands, modes) {
     let operands = [];
     for (let i = 0; i < numOperands; i++) {
       let value = this.readProgramCounter();
-      switch (modes[i]) {          
+      switch (modes[i]) {
         case 1:
            operands.push(value);
            break;
@@ -51,7 +51,7 @@ export class IntCode {
         default:
           operands.push(this.readMemoryAddress(value));
           break
-        
+
       }
     }
 
@@ -68,10 +68,11 @@ export class IntCode {
     if (address < 0) {
       throw `${this.name} Cannot access negative address ${address}`
     }
-    if (address >= this.memory.length) {
+    if ((address >= this.memory.length) || (this.memory[address] == undefined)) {
       // Memory not yet accessed - initialize to zero.
       this.memory[address] = 0;
     }
+
     let res = parseInt(this.memory[address]);
     if (isNaN(res)) {
       throw `${this.name}: Invalid operand at address ${address}: ${this.memory[address]}`;
