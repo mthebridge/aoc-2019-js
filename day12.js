@@ -1,6 +1,6 @@
 // Replace 12 with the day number, then rename and save.
 // Solutions for AoC day 12
-import { read_text_input, assert } from "./utils.js";
+import { read_text_input, assert, test_assert } from "./utils.js";
 
 class State {
     constructor(pos, vel) {
@@ -9,6 +9,27 @@ class State {
     }
 }
 
+function getLcm(a, b, c) {
+
+    // Run Euclid to get the gcd then divide the product by this.
+    console.log(`Finding LCM of ${a}, ${b}, ${c}`)
+
+    function getGcd(a, b) {
+        let r1 = Math.min(a, b)
+        let r2 = Math.max(a, b)
+
+        while (r2 != 0) {
+            let mod = r1 % r2
+            r1 = r2
+            r2 = mod
+        }
+        return  r1
+
+    }
+
+    let abLcm = (a/getGcd(a, b)) * b
+    return (abLcm /getGcd(abLcm, c)) * c
+}
 
 class Moon {
     constructor(x, y, z) {
@@ -112,25 +133,9 @@ function getTotalEnergy(moons) {
     return energy
 }
 
-function checkMatchingState(current, states, axis) {
-    for (let i = 0; i < states.length; i++) {
-        const state = states[i];
-
-        if ((state[0].pos == current[0][axis].pos) &&
-            (state[0].vel == current[0][axis].vel) &&
-            (state[1].pos == current[1][axis].pos) &&
-            (state[1].vel == current[1][axis].vel) &&
-            (state[2].pos == current[2][axis].pos) &&
-            (state[2].vel == current[2][axis].vel) &&
-            (state[3].pos == current[3][axis].pos) &&
-            (state[3].vel == current[3][axis].vel)) {
-                // Match!!
-                console.log(`Found match for ${axis}`)
-                return i
-            }
-
-    }
-    return states.length
+// Stringify the fgiven axis of all the moons
+function stateToString(moons, axis) {
+    return moons.map(m => m[axis].pos + "," + m[axis].vel).join(":")
 }
 
 function run_day12() {
@@ -138,68 +143,59 @@ function run_day12() {
         let moons = parsePositions(input)
         const TIMESTEPS = 1000
         for (let i = 0; i < TIMESTEPS; i++) {
-            if ((i % 10) == 0) {
-                console.debug(`Running loop ${i}`)
-            }
             runSingleTimeStep(moons)
         }
+        let part1energy = getTotalEnergy(moons)
 
         // Part2.  Reset moon state.
         moons = parsePositions(input)
         let step = 0;
-        let xstates = []
-        let ystates = []
-        let zstates = []
         // Cycle - start point and length
-        let xcycle = [0, 0]
-        let ycycle = [0, 0]
-        let zcycle = [0, 0]
+        let xstep = 0
+        let ystep = 0
+        let zstep = 0
+        let startx = stateToString(moons, "x");
+        let starty = stateToString(moons, "y");
+        let startz = stateToString(moons, "z");
+        let currentx = ""
+        let currenty = ""
+        let currentz = ""
 
-        while (xcycle[1] == 0 && ycycle[1] == 0 && zcycle[1] == 0) {
-            if ((step % 10000) == 0) {
-                console.debug(`Running loop ${step}`)
-            }
-            // Store the current state
-            if (xcycle[1] == 0) {
-                xstates.push([{...moons[0].x}, {...moons[1].x}, {...moons[2].x}, {...moons[3].x}])
-            }
-            if (ycycle[1] == 0) {
-                ystates.push([{...moons[0].y}, {...moons[1].y}, {...moons[2].y}, {...moons[3].y}])
-            }
-            if (zcycle[1] == 0) {
-                zstates.push([{...moons[0].z}, {...moons[1].z}, {...moons[2].z}, {...moons[3].z}])
-            }
+        while ((xstep == 0) || (ystep == 0) || (zstep == 0)) {
             runSingleTimeStep(moons)
-            if (xcycle[1] == 0) {
+            step++
+
+            if (xstep == 0) {
                 // Check for a cycle in the x-velocity
-                let match_idx = checkMatchingState(moons, xstates, "x")
-                if (match_idx != xstates.length) {
-                    console.log(`X-state match: step ${match_idx} and step ${step}`)
-                    xcycle = [match_idx, step - match_idx]
+                currentx = stateToString(moons, "x");
+                if (currentx == startx) {
+                    console.log(`X-state match: step ${step}`)
+                    xstep = step
                 }
             }
-            if (ycycle[1] == 0) {
+            if (ystep == 0) {
                 // Check for a cycle in the x-velocity
-                let match_idx = checkMatchingState(moons, ystates, "y")
-                if (match_idx != ystates.length) {
-                    console.log(`Y-state match: step ${match_idx} and step ${step}`)
-                    ycycle = [match_idx, step - match_idx]
+                currenty = stateToString(moons, "y");
+                if (currenty == starty) {
+                    console.log(`Y-state match: step ${step}`)
+                    ystep = step
                 }
             }
 
-            if (zcycle[1] == 0) {
+            if (zstep == 0) {
                 // Check for a cycle in the z-velocity
-                let match_idx = checkMatchingState(moons, zstates, "z")
-                if (match_idx != zstates.length) {
-                    console.log(`Z-state match: step ${match_idx} and step ${step}`)
-                    zcycle = [match_idx, step - match_idx]
+                currentz = stateToString(moons, "z");
+                if (currentz == startz) {
+                    console.log(`Z-state match: step ${step}`)
+                    zstep = step
                 }
             }
-            step++
 
         }
 
-        document.getElementById("day12").innerHTML = `Total energy after ${TIMESTEPS} simulations: ${getTotalEnergy(moons)}`;
+        let cycle = getLcm(xstep, ystep, zstep)
+
+        document.getElementById("day12").innerHTML = `Total energy after ${TIMESTEPS} simulations: ${part1energy}.  Repeating cycle: ${cycle}`;
     })
 }
 
@@ -242,7 +238,11 @@ function tests_day12() {
     assert(moons[3].z.pos, 0)
     assert(moons[3].z.vel, 1)
 
-    document.getElementById("tests12").innerHTML = `${passes}/0 tests passed!`;
+
+    passes += test_assert("1.1", getLcm(4, 6, 14), 84)
+    passes += test_assert("1.2", getLcm(15, 7, 10), 210)
+
+    document.getElementById("tests12").innerHTML = `${passes}/2 tests passed!`;
 
 }
 
