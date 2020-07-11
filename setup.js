@@ -1,6 +1,6 @@
 
 /// Initialiation
-const AVAILABLE_DAYS = 12;
+const AVAILABLE_DAYS = 13;
 
 import { run_day1, tests_day1 } from './day1.js';
 import { run_day2, tests_day2 } from './day2.js';
@@ -14,6 +14,7 @@ import { run_day9, tests_day9 } from './day9.js';
 import { run_day10, tests_day10 } from './day10.js';
 import { run_day11, tests_day11 } from './day11.js';
 import { run_day12, tests_day12 } from './day12.js';
+import { run_day13, tests_day13 } from './day13.js';
 // import { run_day{{n}}, tests_day{{n}} } from './day{{n}}.js';
 
 export function setup() {
@@ -70,6 +71,10 @@ export function setup() {
             case 12:
                 runFn = run_day12;
                 testFn = tests_day12;
+                break;
+            case 13:
+                runFn = run_day13;
+                testFn = tests_day13;
                 break;
             // case {{n}}:
             //     runFn = run_day{{n}};
