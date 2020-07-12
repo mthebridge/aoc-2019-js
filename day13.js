@@ -9,6 +9,7 @@ var xball = 0;
 var xpaddle = 0;
 var lastoutput = 0;
 var numBlocks = 0;
+var arcade = null;
 
 function run_day13() {
     read_text_input("inputs/day13.txt", (input) => {
@@ -91,6 +92,7 @@ function run_day13() {
         }
 
         let runGame = () => {
+            arcade = new IntCode(game, joystick())
             arcade.run().then(() => {
                 // Re-generate outputs in case score has changed!
                 processOutput()
@@ -98,7 +100,6 @@ function run_day13() {
             })
         }
 
-        let arcade = new IntCode(game, joystick())
         if (arcadeWindow == null || arcadeWindow.closed) {
             arcadeWindow = window.open("arcade.html",
                 "Arcade",
