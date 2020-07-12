@@ -1,6 +1,9 @@
 #display {
     background: black;
     max-width: 80%;
+    color: green;
+    font-family: monospace;
+    font-size: 32px;
 }
 
 .grid {
@@ -11,13 +14,19 @@
     align-content: center;
 }
 
+.score {
+
+    text-align: right;
+    align-content: right;
+}
+
 .cell {
     width: 20px;
     height: 20px;
 }
 
 .empty {
-    background-color: transparent;
+    background-color: black;
 }
 
 .wall {
@@ -31,9 +40,7 @@
 
 .paddle {
     background-color: yellow;
-    border-width: 5px 0px;
-    border-style: solid;
-    border-color: black;
+    height: 10px;
 }
 
 .ball {

@@ -4,28 +4,50 @@ import { read_text_input, test_assert } from "./utils.js";
 import { IntCode, arrayInputGenerator } from "./intcode.js";
 
 var arcadeWindow = null;
-var gameOutput = ""
-function renderOutput() {
-    console.log("Rendering output...")
-    arcadeWindow.document.getElementById("display").innerHTML = gameOutput
-}
+var score = 0;
+var xball = 0;
+var xpaddle = 0;
+var lastoutput = 0;
+var numBlocks = 0;
 
 function run_day13() {
     read_text_input("inputs/day13.txt", (input) => {
-        let arcade = new IntCode(input.split(","), arrayInputGenerator([]))
-        arcade.run().then(_ => {
-            let numBlocks = 0;
-            let width = 0;
-            let height = 0;
+        let game = input.split(",")
+        // Comment this out to get static setup
+        game[0] = 2
+        async function* joystick() {
+            while (!arcade.halted) {
+                processOutput()
+                // Sleep before each input to avoid CPU load
+                function sleep(duration) {
+                    return new Promise(resolve => setTimeout(resolve, duration))
+                }
+                await sleep(0.2)
+                // Emulate sending inputs,
+                // based on whther the ball is left or right of the paddle.
+                if (xball < xpaddle) {
+                    yield -1
+                } else if (xball > xpaddle) {
+                    yield 1
+                } else {
+                    yield 0
+                }
+            }
+        }
 
-            let output = `<div class="grid">`
+        function processOutput() {
+            let grid = arcadeWindow.document.getElementById("gamegrid")
+            for (lastoutput; lastoutput < arcade.outputs.length; lastoutput += 3) {
+                const x = arcade.outputs[lastoutput]
+                const y = arcade.outputs[lastoutput + 1]
+                const tileId = arcade.outputs[lastoutput + 2]
 
-            for (let i = 0; i < arcade.outputs.length; i += 3) {
-                const x = arcade.outputs[i]
-                width = Math.max(width, x + 1)
-                const y = arcade.outputs[i + 1]
-                height = Math.max(height, y + 1)
-                const tileId = arcade.outputs[i + 2]
+                if ((x == -1) && (y == 0)) {
+                    //Score update
+                    score = tileId
+                    arcadeWindow.document.getElementById("scoreval").innerHTML = `${score}`
+                    continue
+                }
                 let tileClass;
                 switch (tileId) {
                     case 0:
@@ -40,9 +62,11 @@ function run_day13() {
                         break;
                     case 3:
                         tileClass = "paddle"
+                        xpaddle = x;
                         break;
                     case 4:
                         tileClass = "ball"
+                        xball = x;
                         break;
 
                     default:
@@ -50,31 +74,45 @@ function run_day13() {
                         break;
                 }
 
-                // console.debug(`Tile ${tileClass} at (${x}, ${y})`)
-                output += `<div class="cell ${tileClass}" style="grid-row:${y + 1};grid-column:${x + 1}"><pre> </pre></div>`
-            }
-            output += `</div>`
-            // Now render the grid!
-            gameOutput = output
-            // console.log(gameOutput)
-            if (arcadeWindow == null || arcadeWindow.closed) {
-                arcadeWindow = window.open("arcade.html",
-                    "Arcade",
-                    `location=no,status=no,resizable=no,scrollbars=no,toolbar=no,menubar=no`);
-                    arcadeWindow.onload = renderOutput
-            } else {
-                renderOutput()
+                console.debug(`Tile ${tileClass} at (${x}, ${y})`)
+                let cellId = `${x},${y}`
+                let elem = arcadeWindow.document.getElementById(cellId)
+                if (elem == null) {
+                    elem = arcadeWindow.document.createElement("div")
+                    grid.appendChild(elem)
+                }
+                elem.setAttribute("class", `cell ${tileClass}`)
+                elem.setAttribute("id", cellId)
+                elem.style.setProperty("grid-row", `${y + 1}`)
+                elem.style.setProperty("grid-column", `${x + 1}`)
+                elem.innerHTML = "<pre> </pre>"
             }
 
-            document.getElementById("day13").innerHTML = `Grid has ${numBlocks} blocks`;
-        })
+        }
+
+        let runGame = () => {
+            arcade.run().then(() => {
+                // Re-generate outputs in case score has changed!
+                processOutput()
+                document.getElementById("day13").innerHTML = `Number of Blocks: ${numBlocks}.  Final score: ${score}.`;
+            })
+        }
+
+        let arcade = new IntCode(game, joystick())
+        if (arcadeWindow == null || arcadeWindow.closed) {
+            arcadeWindow = window.open("arcade.html",
+                "Arcade",
+                `location=no,status=no,resizable=no,scrollbars=no,toolbar=no,menubar=no`);
+            arcadeWindow.onload = runGame
+        } else {
+            runGame()
+        }
     })
 }
 
 function tests_day13() {
     let passes = 0;
     document.getElementById("tests13").innerHTML = `${passes}/0 tests passed!`;
-
 }
 
 export { run_day13, tests_day13 };
